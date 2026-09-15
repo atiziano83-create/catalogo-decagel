@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Catalogo DE.CA.GEL.</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="theme-color" content="#2c3e50">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    background: #f2f4f6;
+    color: #222;
+  }
+  header {
+    background: #2c3e50;
+    color: white;
+    padding: 14px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  header h1 { margin: 0; font-size: 18px; }
+  header .sotto {
+    font-size: 12px;
+    color: #cfd8dc;
+    margin-top: 2px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  #btnAggiorna {
+    background: #34495e;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 12px;
+  }
+  .filtri {
+    padding: 10px 16px;
+    background: white;
+    border-bottom: 1px solid #e0e0e0;
+    position: sticky;
+    top: 56px;
+    z-index: 9;
+  }
+  .filtri input, .filtri select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 8px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 15px;
+  }
+  .riga-select { display: flex; gap: 8px; }
+  .riga-select select { flex: 1; margin-bottom: 0; }
+  #contatore {
+    padding: 8px 16px;
+    font-size: 13px;
+    color: #666;
+  }
+  #lista { padding: 0 16px 24px 16px; }
+  .prodotto {
+    background: white;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+  }
+  .prodotto .riga-principale {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+  }
+  .prodotto .nome { font-weight: 600; font-size: 15px; }
+  .prodotto .codice { font-size: 12px; color: #888; margin-top: 2px; }
+  .prodotto .prezzo-rapido { font-weight: 700; font-size: 15px; color: #2c3e50; white-space: nowrap; margin-left: 10px; }
+  .dettaglio {
+    display: none;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+    font-size: 14px;
+  }
+  .dettaglio.aperto { display: block; }
+  .dettaglio div { padding: 3px 0; display: flex; justify-content: space-between; }
+  .dettaglio .etichetta { color: #777; }
+  .dettaglio .valore { font-weight: 600; text-align: right; }
+  #nessunRisultato, #erroreCaricamento {
+    text-align: center;
+    color: #888;
+    padding: 30px 16px;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📋 Catalogo DE.CA.GEL.</h1>
+  <div class="sotto">
+    <span id="infoAggiornamento">Caricamento...</span>
+    <button id="btnAggiorna">🔄 Aggiorna</button>
+  </div>
+</header>
+
+<div class="filtri">
+  <input type="text" id="campoRicerca" placeholder="Cerca per nome o codice...">
+  <div class="riga-select">
+    <select id="selezioneCategoria"><option value="Tutte">Tutte le categorie</option></select>
+    <select id="selezioneFornitore"><option value="Tutti">Tutti i fornitori</option></select>
+  </div>
+</div>
+
+<div id="contatore"></div>
+<div id="lista"></div>
+<div id="nessunRisultato">Nessun prodotto trovato.</div>
+<div id="erroreCaricamento">⚠️ Impossibile caricare i dati. Controlla la connessione e riprova.</div>
+
+<script>
+const URL_DATI = "dati.json";
+const CHIAVE_LOCALSTORAGE = "catalogo_decagel_dati";
+let datiCorrenti = null;
+
+function formattaEuro(valore) {
+  if (valore === null || valore === undefined) return "—";
+  return "€ " + valore.toFixed(2).replace(".", ",");
+}
+
+function formattaData(isoString) {
+  if (!isoString) return "";
+  const d = new Date(isoString);
+  const pad = n => String(n).padStart(2, "0");
+  return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function popolaFiltri(prodotti) {
+  const categorie = [...new Set(prodotti.map(p => p.categoria).filter(c => c))].sort();
+  const fornitori = [...new Set(prodotti.map(p => p.fornitore).filter(f => f))].sort();
+
+  const selCat = document.getElementById("selezioneCategoria");
+  const selForn = document.getElementById("selezioneFornitore");
+  const catPrecedente = selCat.value;
+  const fornPrecedente = selForn.value;
+
+  selCat.innerHTML = '<option value="Tutte">Tutte le categorie</option>' +
+    categorie.map(c => `<option value="${c}">${c}</option>`).join("");
+  selForn.innerHTML = '<option value="Tutti">Tutti i fornitori</option>' +
+    fornitori.map(f => `<option value="${f}">${f}</option>`).join("");
+
+  if (categorie.includes(catPrecedente)) selCat.value = catPrecedente;
+  if (fornitori.includes(fornPrecedente)) selForn.value = fornPrecedente;
+}
+
+function filtraProdotti(prodotti, testoRicerca, categoria, fornitore) {
+  const testo = testoRicerca.trim().toLowerCase();
+  return prodotti.filter(p => {
+    const testoOk = !testo ||
+      p.codice.toLowerCase().includes(testo) ||
+      p.nome.toLowerCase().includes(testo);
+    const categoriaOk = categoria === "Tutte" || p.categoria === categoria;
+    const fornitoreOk = fornitore === "Tutti" || p.fornitore === fornitore;
+    return testoOk && categoriaOk && fornitoreOk;
+  });
+}
+
+function disegnaLista(prodotti) {
+  const lista = document.getElementById("lista");
+  const nessunRisultato = document.getElementById("nessunRisultato");
+  const contatore = document.getElementById("contatore");
+
+  contatore.textContent = `${prodotti.length} prodotto/i`;
+
+  if (prodotti.length === 0) {
+    lista.innerHTML = "";
+    nessunRisultato.style.display = "block";
+    return;
+  }
+  nessunRisultato.style.display = "none";
+
+  lista.innerHTML = prodotti.map((p, indice) => `
+    <div class="prodotto">
+      <div class="riga-principale" onclick="apriChiudiDettaglio(${indice})">
+        <div>
+          <div class="nome">${p.nome}</div>
+          <div class="codice">${p.codice} · ${p.categoria || "—"} · ${p.fornitore || "—"}</div>
+        </div>
+        <div class="prezzo-rapido">${formattaEuro(p.prezzo_pezzo)}</div>
+      </div>
+      <div class="dettaglio" id="dettaglio-${indice}">
+        <div><span class="etichetta">Codice</span><span class="valore">${p.codice}</span></div>
+        <div><span class="etichetta">Categoria</span><span class="valore">${p.categoria || "—"}</span></div>
+        <div><span class="etichetta">Fornitore</span><span class="valore">${p.fornitore || "—"}</span></div>
+        <div><span class="etichetta">UM</span><span class="valore">${p.um || "—"}</span></div>
+        <div><span class="etichetta">Prezzo a cartone</span><span class="valore">${formattaEuro(p.prezzo_cartone)}</span></div>
+        <div><span class="etichetta">Prezzo al pezzo</span><span class="valore">${formattaEuro(p.prezzo_pezzo)}</span></div>
+        <div><span class="etichetta">IVA</span><span class="valore">${p.iva !== null && p.iva !== undefined ? p.iva + "%" : "—"}</span></div>
+      </div>
+    </div>
+  `).join("");
+}
+
+window._prodottiVisualizzati = [];
+
+function apriChiudiDettaglio(indice) {
+  const el = document.getElementById(`dettaglio-${indice}`);
+  el.classList.toggle("aperto");
+}
+
+function applicaFiltri() {
+  if (!datiCorrenti) return;
+  const testo = document.getElementById("campoRicerca").value;
+  const categoria = document.getElementById("selezioneCategoria").value;
+  const fornitore = document.getElementById("selezioneFornitore").value;
+  const risultati = filtraProdotti(datiCorrenti.prodotti, testo, categoria, fornitore);
+  window._prodottiVisualizzati = risultati;
+  disegnaLista(risultati);
+}
+
+function mostraDati(dati, dallaCache) {
+  datiCorrenti = dati;
+  popolaFiltri(dati.prodotti);
+  applicaFiltri();
+  const suffisso = dallaCache ? " (salvati sul telefono)" : "";
+  document.getElementById("infoAggiornamento").textContent =
+    `Aggiornato il ${formattaData(dati.generato_il)}${suffisso}`;
+  document.getElementById("erroreCaricamento").style.display = "none";
+}
+
+function caricaDaLocalStorage() {
+  const salvato = localStorage.getItem(CHIAVE_LOCALSTORAGE);
+  if (salvato) {
+    try {
+      return JSON.parse(salvato);
+    } catch (e) {
+      return null;
+    }
+  }
+  return null;
+}
+
+function scaricaDatiFreschi() {
+  const urlConCacheBust = URL_DATI + "?t=" + Date.now();
+  fetch(urlConCacheBust)
+    .then(risposta => {
+      if (!risposta.ok) throw new Error("Risposta non valida");
+      return risposta.json();
+    })
+    .then(dati => {
+      localStorage.setItem(CHIAVE_LOCALSTORAGE, JSON.stringify(dati));
+      mostraDati(dati, false);
+    })
+    .catch(errore => {
+      const datiSalvati = caricaDaLocalStorage();
+      if (datiSalvati) {
+        mostraDati(datiSalvati, true);
+      } else {
+        document.getElementById("erroreCaricamento").style.display = "block";
+        document.getElementById("infoAggiornamento").textContent = "Nessun dato disponibile";
+      }
+    });
+}
+
+// All'avvio: mostra subito i dati salvati (se ci sono), poi prova ad aggiornarli in background
+const datiSalvatiIniziali = caricaDaLocalStorage();
+if (datiSalvatiIniziali) {
+  mostraDati(datiSalvatiIniziali, true);
+}
+scaricaDatiFreschi();
+
+document.getElementById("campoRicerca").addEventListener("input", applicaFiltri);
+document.getElementById("selezioneCategoria").addEventListener("change", applicaFiltri);
+document.getElementById("selezioneFornitore").addEventListener("change", applicaFiltri);
+document.getElementById("btnAggiorna").addEventListener("click", () => {
+  document.getElementById("infoAggiornamento").textContent = "Aggiorno...";
+  scaricaDatiFreschi();
+});
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("service-worker.js");
+}
+</script>
+
+</body>
+</html>
