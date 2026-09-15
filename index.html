@@ -10,6 +10,7 @@
 <meta name="theme-color" content="#2c3e50">
 <style>
   * { box-sizing: border-box; }
+  html { font-size: 18px; }
   body {
     margin: 0;
     font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
@@ -19,16 +20,16 @@
   header {
     background: #2c3e50;
     color: white;
-    padding: 14px 16px;
+    padding: 16px;
     position: sticky;
     top: 0;
     z-index: 10;
   }
-  header h1 { margin: 0; font-size: 18px; }
+  header h1 { margin: 0; font-size: 1.3rem; }
   header .sotto {
-    font-size: 12px;
+    font-size: 0.75rem;
     color: #cfd8dc;
-    margin-top: 2px;
+    margin-top: 4px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -37,38 +38,85 @@
     background: #34495e;
     color: white;
     border: none;
-    border-radius: 6px;
-    padding: 5px 10px;
-    font-size: 12px;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 0.75rem;
   }
-  .filtri {
-    padding: 10px 16px;
+  .barra-ricerca {
+    padding: 12px 16px;
     background: white;
     border-bottom: 1px solid #e0e0e0;
     position: sticky;
-    top: 56px;
+    top: 68px;
     z-index: 9;
   }
-  .filtri input, .filtri select {
+  .barra-ricerca input {
     width: 100%;
-    padding: 10px;
-    margin-bottom: 8px;
+    padding: 14px;
     border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 15px;
+    border-radius: 10px;
+    font-size: 1.05rem;
   }
-  .riga-select { display: flex; gap: 8px; }
-  .riga-select select { flex: 1; margin-bottom: 0; }
+  #paginaHome {
+    padding: 20px 16px;
+  }
+  .pulsante-grande {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 20px 18px;
+    margin-bottom: 12px;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #2c3e50;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .pulsante-grande .emoji { font-size: 1.6rem; }
+  #barraNavigazione {
+    display: none;
+    padding: 10px 16px;
+    background: white;
+    border-bottom: 1px solid #e0e0e0;
+    align-items: center;
+    gap: 10px;
+  }
+  #barraNavigazione.visibile { display: flex; }
+  #btnIndietro {
+    background: #eef1f3;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+  #titoloSezione { font-size: 1.05rem; font-weight: 600; }
+
   #contatore {
-    padding: 8px 16px;
-    font-size: 13px;
+    padding: 10px 16px;
+    font-size: 0.85rem;
     color: #666;
   }
   #lista { padding: 0 16px 24px 16px; }
+
+  .voce-elenco {
+    background: white;
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2c3e50;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  }
+
   .prodotto {
     background: white;
     border-radius: 10px;
-    padding: 12px 14px;
+    padding: 14px 16px;
     margin-bottom: 8px;
     box-shadow: 0 1px 2px rgba(0,0,0,0.08);
   }
@@ -76,27 +124,37 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    cursor: pointer;
   }
-  .prodotto .nome { font-weight: 600; font-size: 15px; }
-  .prodotto .codice { font-size: 12px; color: #888; margin-top: 2px; }
-  .prodotto .prezzo-rapido { font-weight: 700; font-size: 15px; color: #2c3e50; white-space: nowrap; margin-left: 10px; }
+  .prodotto .nome { font-weight: 700; font-size: 1.08rem; line-height: 1.3; }
+  .prodotto .codice { font-size: 0.85rem; color: #888; margin-top: 3px; }
+  .prodotto .prezzo-rapido {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #2c3e50;
+    white-space: nowrap;
+    margin-left: 10px;
+    text-align: right;
+  }
+  .prodotto .prezzo-rapido .um-piccola { display: block; font-size: 0.65rem; font-weight: 400; color: #999; }
+
   .dettaglio {
     display: none;
-    margin-top: 10px;
-    padding-top: 10px;
+    margin-top: 12px;
+    padding-top: 12px;
     border-top: 1px solid #eee;
-    font-size: 14px;
+    font-size: 1rem;
   }
   .dettaglio.aperto { display: block; }
-  .dettaglio div { padding: 3px 0; display: flex; justify-content: space-between; }
+  .dettaglio div { padding: 5px 0; display: flex; justify-content: space-between; }
   .dettaglio .etichetta { color: #777; }
-  .dettaglio .valore { font-weight: 600; text-align: right; }
+  .dettaglio .valore { font-weight: 700; text-align: right; }
+
   #nessunRisultato, #erroreCaricamento {
     text-align: center;
     color: #888;
     padding: 30px 16px;
     display: none;
+    font-size: 1rem;
   }
 </style>
 </head>
@@ -110,12 +168,25 @@
   </div>
 </header>
 
-<div class="filtri">
-  <input type="text" id="campoRicerca" placeholder="Cerca per nome o codice...">
-  <div class="riga-select">
-    <select id="selezioneCategoria"><option value="Tutte">Tutte le categorie</option></select>
-    <select id="selezioneFornitore"><option value="Tutti">Tutti i fornitori</option></select>
-  </div>
+<div class="barra-ricerca">
+  <input type="text" id="campoRicerca" placeholder="🔍 Cerca per nome o codice...">
+</div>
+
+<div id="barraNavigazione">
+  <button id="btnIndietro">← Indietro</button>
+  <span id="titoloSezione"></span>
+</div>
+
+<div id="paginaHome">
+  <button class="pulsante-grande" onclick="vaiA('listaTutti')">
+    <span class="emoji">📦</span> Tutti i prodotti
+  </button>
+  <button class="pulsante-grande" onclick="vaiA('sceltaFornitore')">
+    <span class="emoji">🏭</span> Cerca per fornitore
+  </button>
+  <button class="pulsante-grande" onclick="vaiA('sceltaCategoria')">
+    <span class="emoji">🗂️</span> Cerca per categoria
+  </button>
 </div>
 
 <div id="contatore"></div>
@@ -127,6 +198,9 @@
 const URL_DATI = "dati.json";
 const CHIAVE_LOCALSTORAGE = "catalogo_decagel_dati";
 let datiCorrenti = null;
+
+let schermoAttuale = "home";
+let filtroAttuale = { tipo: null, valore: null };
 
 function formattaEuro(valore) {
   if (valore === null || valore === undefined) return "—";
@@ -140,37 +214,90 @@ function formattaData(isoString) {
   return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
-function popolaFiltri(prodotti) {
-  const categorie = [...new Set(prodotti.map(p => p.categoria).filter(c => c))].sort();
-  const fornitori = [...new Set(prodotti.map(p => p.fornitore).filter(f => f))].sort();
-
-  const selCat = document.getElementById("selezioneCategoria");
-  const selForn = document.getElementById("selezioneFornitore");
-  const catPrecedente = selCat.value;
-  const fornPrecedente = selForn.value;
-
-  selCat.innerHTML = '<option value="Tutte">Tutte le categorie</option>' +
-    categorie.map(c => `<option value="${c}">${c}</option>`).join("");
-  selForn.innerHTML = '<option value="Tutti">Tutti i fornitori</option>' +
-    fornitori.map(f => `<option value="${f}">${f}</option>`).join("");
-
-  if (categorie.includes(catPrecedente)) selCat.value = catPrecedente;
-  if (fornitori.includes(fornPrecedente)) selForn.value = fornPrecedente;
+function elencoUnico(prodotti, campo) {
+  return [...new Set(prodotti.map(p => p[campo]).filter(v => v))].sort();
 }
 
-function filtraProdotti(prodotti, testoRicerca, categoria, fornitore) {
+function filtraProdotti(prodotti, testoRicerca, filtro) {
   const testo = testoRicerca.trim().toLowerCase();
   return prodotti.filter(p => {
     const testoOk = !testo ||
       p.codice.toLowerCase().includes(testo) ||
       p.nome.toLowerCase().includes(testo);
-    const categoriaOk = categoria === "Tutte" || p.categoria === categoria;
-    const fornitoreOk = fornitore === "Tutti" || p.fornitore === fornitore;
-    return testoOk && categoriaOk && fornitoreOk;
+    let filtroOk = true;
+    if (filtro && filtro.tipo === "fornitore") filtroOk = p.fornitore === filtro.valore;
+    if (filtro && filtro.tipo === "categoria") filtroOk = p.categoria === filtro.valore;
+    return testoOk && filtroOk;
   });
 }
 
-function disegnaLista(prodotti) {
+// ============================================================
+// Navigazione tra schermate
+// ============================================================
+function vaiA(schermo, filtro) {
+  schermoAttuale = schermo;
+  filtroAttuale = filtro || { tipo: null, valore: null };
+  document.getElementById("campoRicerca").value = "";
+  disegnaSchermo();
+}
+
+function disegnaSchermo() {
+  const paginaHome = document.getElementById("paginaHome");
+  const barraNav = document.getElementById("barraNavigazione");
+  const titoloSezione = document.getElementById("titoloSezione");
+
+  if (schermoAttuale === "home") {
+    paginaHome.style.display = "block";
+    barraNav.classList.remove("visibile");
+    document.getElementById("contatore").textContent = "";
+    document.getElementById("lista").innerHTML = "";
+    document.getElementById("nessunRisultato").style.display = "none";
+    return;
+  }
+
+  paginaHome.style.display = "none";
+  barraNav.classList.add("visibile");
+
+  if (!datiCorrenti) return;
+
+  if (schermoAttuale === "sceltaFornitore") {
+    titoloSezione.textContent = "Scegli un fornitore";
+    disegnaElencoScelta(elencoUnico(datiCorrenti.prodotti, "fornitore"), "fornitore");
+  } else if (schermoAttuale === "sceltaCategoria") {
+    titoloSezione.textContent = "Scegli una categoria";
+    disegnaElencoScelta(elencoUnico(datiCorrenti.prodotti, "categoria"), "categoria");
+  } else if (schermoAttuale === "listaTutti") {
+    titoloSezione.textContent = "Tutti i prodotti";
+    applicaFiltri();
+  } else if (schermoAttuale === "listaFiltrata") {
+    titoloSezione.textContent = filtroAttuale.valore;
+    applicaFiltri();
+  }
+}
+
+function disegnaElencoScelta(valori, tipo) {
+  document.getElementById("contatore").textContent = "";
+  document.getElementById("nessunRisultato").style.display = "none";
+  const lista = document.getElementById("lista");
+  lista.innerHTML = valori.map(v => `
+    <div class="voce-elenco" onclick='vaiA("listaFiltrata", {tipo:"${tipo}", valore:${JSON.stringify(v)}})'>
+      ${v}
+    </div>
+  `).join("");
+}
+
+document.getElementById("btnIndietro").addEventListener("click", () => {
+  if (schermoAttuale === "listaFiltrata") {
+    vaiA(filtroAttuale.tipo === "fornitore" ? "sceltaFornitore" : "sceltaCategoria");
+  } else {
+    vaiA("home");
+  }
+});
+
+// ============================================================
+// Elenco prodotti (con ricerca libera, sempre attiva se scritta)
+// ============================================================
+function disegnaListaProdotti(prodotti) {
   const lista = document.getElementById("lista");
   const nessunRisultato = document.getElementById("nessunRisultato");
   const contatore = document.getElementById("contatore");
@@ -191,7 +318,7 @@ function disegnaLista(prodotti) {
           <div class="nome">${p.nome}</div>
           <div class="codice">${p.codice} · ${p.categoria || "—"} · ${p.fornitore || "—"}</div>
         </div>
-        <div class="prezzo-rapido">${formattaEuro(p.prezzo_pezzo)}</div>
+        <div class="prezzo-rapido">${formattaEuro(p.prezzo_cartone)}<span class="um-piccola">a cartone</span></div>
       </div>
       <div class="dettaglio" id="dettaglio-${indice}">
         <div><span class="etichetta">Codice</span><span class="valore">${p.codice}</span></div>
@@ -206,41 +333,33 @@ function disegnaLista(prodotti) {
   `).join("");
 }
 
-window._prodottiVisualizzati = [];
-
 function apriChiudiDettaglio(indice) {
-  const el = document.getElementById(`dettaglio-${indice}`);
-  el.classList.toggle("aperto");
+  document.getElementById(`dettaglio-${indice}`).classList.toggle("aperto");
 }
 
 function applicaFiltri() {
   if (!datiCorrenti) return;
   const testo = document.getElementById("campoRicerca").value;
-  const categoria = document.getElementById("selezioneCategoria").value;
-  const fornitore = document.getElementById("selezioneFornitore").value;
-  const risultati = filtraProdotti(datiCorrenti.prodotti, testo, categoria, fornitore);
-  window._prodottiVisualizzati = risultati;
-  disegnaLista(risultati);
+  const risultati = filtraProdotti(datiCorrenti.prodotti, testo, filtroAttuale);
+  disegnaListaProdotti(risultati);
 }
 
+// ============================================================
+// Caricamento dati (online con fallback offline)
+// ============================================================
 function mostraDati(dati, dallaCache) {
   datiCorrenti = dati;
-  popolaFiltri(dati.prodotti);
-  applicaFiltri();
   const suffisso = dallaCache ? " (salvati sul telefono)" : "";
   document.getElementById("infoAggiornamento").textContent =
     `Aggiornato il ${formattaData(dati.generato_il)}${suffisso}`;
   document.getElementById("erroreCaricamento").style.display = "none";
+  disegnaSchermo();
 }
 
 function caricaDaLocalStorage() {
   const salvato = localStorage.getItem(CHIAVE_LOCALSTORAGE);
   if (salvato) {
-    try {
-      return JSON.parse(salvato);
-    } catch (e) {
-      return null;
-    }
+    try { return JSON.parse(salvato); } catch (e) { return null; }
   }
   return null;
 }
@@ -256,7 +375,7 @@ function scaricaDatiFreschi() {
       localStorage.setItem(CHIAVE_LOCALSTORAGE, JSON.stringify(dati));
       mostraDati(dati, false);
     })
-    .catch(errore => {
+    .catch(() => {
       const datiSalvati = caricaDaLocalStorage();
       if (datiSalvati) {
         mostraDati(datiSalvati, true);
@@ -267,16 +386,23 @@ function scaricaDatiFreschi() {
     });
 }
 
-// All'avvio: mostra subito i dati salvati (se ci sono), poi prova ad aggiornarli in background
 const datiSalvatiIniziali = caricaDaLocalStorage();
 if (datiSalvatiIniziali) {
   mostraDati(datiSalvatiIniziali, true);
 }
 scaricaDatiFreschi();
 
-document.getElementById("campoRicerca").addEventListener("input", applicaFiltri);
-document.getElementById("selezioneCategoria").addEventListener("change", applicaFiltri);
-document.getElementById("selezioneFornitore").addEventListener("change", applicaFiltri);
+document.getElementById("campoRicerca").addEventListener("input", () => {
+  const testo = document.getElementById("campoRicerca").value;
+  if (testo.trim() !== "" && schermoAttuale === "home") {
+    vaiA("listaTutti");
+    document.getElementById("campoRicerca").value = testo;
+  }
+  if (schermoAttuale !== "home" && schermoAttuale !== "sceltaFornitore" && schermoAttuale !== "sceltaCategoria") {
+    applicaFiltri();
+  }
+});
+
 document.getElementById("btnAggiorna").addEventListener("click", () => {
   document.getElementById("infoAggiornamento").textContent = "Aggiorno...";
   scaricaDatiFreschi();
