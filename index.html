@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Catalogo DE.CA.GEL.</title>
+<title>Listino Decagel</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -161,7 +161,7 @@
 <body>
 
 <header>
-  <h1>📋 Catalogo DE.CA.GEL.</h1>
+  <h1>📋 Listino Decagel</h1>
   <div class="sotto">
     <span id="infoAggiornamento">Caricamento...</span>
     <button id="btnAggiorna">🔄 Aggiorna</button>
@@ -186,6 +186,9 @@
   </button>
   <button class="pulsante-grande" onclick="vaiA('sceltaCategoria')">
     <span class="emoji">🗂️</span> Cerca per categoria
+  </button>
+  <button class="pulsante-grande" onclick="vaiA('listaPrezziConsigliati', {tipo:'prezzoConsigliato', valore:null})">
+    <span class="emoji">💰</span> Prezzi consigliati
   </button>
 </div>
 
@@ -227,6 +230,7 @@ function filtraProdotti(prodotti, testoRicerca, filtro) {
     let filtroOk = true;
     if (filtro && filtro.tipo === "fornitore") filtroOk = p.fornitore === filtro.valore;
     if (filtro && filtro.tipo === "categoria") filtroOk = p.categoria === filtro.valore;
+    if (filtro && filtro.tipo === "prezzoConsigliato") filtroOk = p.prezzo_consigliato !== null && p.prezzo_consigliato !== undefined;
     return testoOk && filtroOk;
   });
 }
@@ -272,6 +276,9 @@ function disegnaSchermo() {
   } else if (schermoAttuale === "listaFiltrata") {
     titoloSezione.textContent = filtroAttuale.valore;
     applicaFiltri();
+  } else if (schermoAttuale === "listaPrezziConsigliati") {
+    titoloSezione.textContent = "Prezzi consigliati";
+    applicaFiltri();
   }
 }
 
@@ -311,6 +318,8 @@ function disegnaListaProdotti(prodotti) {
   }
   nessunRisultato.style.display = "none";
 
+  const inVistaPrezziConsigliati = schermoAttuale === "listaPrezziConsigliati";
+
   lista.innerHTML = prodotti.map((p, indice) => `
     <div class="prodotto">
       <div class="riga-principale" onclick="apriChiudiDettaglio(${indice})">
@@ -318,7 +327,7 @@ function disegnaListaProdotti(prodotti) {
           <div class="nome">${p.nome}</div>
           <div class="codice">${p.codice} · ${p.categoria || "—"} · ${p.fornitore || "—"}</div>
         </div>
-        <div class="prezzo-rapido">${formattaEuro(p.prezzo_cartone)}<span class="um-piccola">a cartone</span></div>
+        <div class="prezzo-rapido">${inVistaPrezziConsigliati ? formattaEuro(p.prezzo_consigliato) + '<span class="um-piccola">consigliato</span>' : formattaEuro(p.prezzo_cartone) + '<span class="um-piccola">a cartone</span>'}</div>
       </div>
       <div class="dettaglio" id="dettaglio-${indice}">
         <div><span class="etichetta">Codice</span><span class="valore">${p.codice}</span></div>
@@ -327,6 +336,7 @@ function disegnaListaProdotti(prodotti) {
         <div><span class="etichetta">UM</span><span class="valore">${p.um || "—"}</span></div>
         <div><span class="etichetta">Prezzo a cartone</span><span class="valore">${formattaEuro(p.prezzo_cartone)}</span></div>
         <div><span class="etichetta">Prezzo al pezzo</span><span class="valore">${formattaEuro(p.prezzo_pezzo)}</span></div>
+        <div><span class="etichetta">Prezzo consigliato</span><span class="valore">${formattaEuro(p.prezzo_consigliato)}</span></div>
         <div><span class="etichetta">IVA</span><span class="valore">${p.iva !== null && p.iva !== undefined ? p.iva + "%" : "—"}</span></div>
       </div>
     </div>
