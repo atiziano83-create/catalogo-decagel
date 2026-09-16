@@ -336,7 +336,6 @@ function disegnaListaProdotti(prodotti) {
         <div><span class="etichetta">UM</span><span class="valore">${p.um || "—"}</span></div>
         <div><span class="etichetta">Prezzo a cartone</span><span class="valore">${formattaEuro(p.prezzo_cartone)}</span></div>
         <div><span class="etichetta">Prezzo al pezzo</span><span class="valore">${formattaEuro(p.prezzo_pezzo)}</span></div>
-        <div><span class="etichetta">Prezzo consigliato</span><span class="valore">${formattaEuro(p.prezzo_consigliato)}</span></div>
         <div><span class="etichetta">IVA</span><span class="valore">${p.iva !== null && p.iva !== undefined ? p.iva + "%" : "—"}</span></div>
       </div>
     </div>
