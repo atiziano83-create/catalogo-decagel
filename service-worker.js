@@ -1,4 +1,4 @@
-const NOME_CACHE = "catalogo-decagel-v4";
+const NOME_CACHE = "catalogo-decagel-v5";
 const FILE_DA_SALVARE = [
   "./index.html",
   "./manifest.json",
